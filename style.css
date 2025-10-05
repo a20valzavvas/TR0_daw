@@ -49,6 +49,16 @@ p {
   color: #7d6f74;
 }
 
+.subtitol { 
+  margin-top: 4px; 
+  color: #7b4fa0; 
+  font-size: 1.2em; 
+}
+.intro { 
+  margin: 10px 0 18px; 
+  color: #6f6570; 
+}
+
 /* ===== Botons ===== */
 button {
   border: none;

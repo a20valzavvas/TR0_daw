@@ -405,6 +405,11 @@ function renderFormPregunta(id) {
 function renderInici() {
     app.innerHTML = `
         <h1>Autoescola UMDP</h1>
+        <h2 class="subtitol">Simulador de proves tipus test</h2>
+        <p class="intro">
+            Posa’t a prova amb preguntes reals de circulació, imatges i temporitzador.
+            Practica al teu ritme, desa el progrés i prepara’t per a l’examen teòric.
+        </p>
         <button id="startBtn"> Començar </button>
         <button id="adminBtn"> Administrar preguntes </button>
     `;
