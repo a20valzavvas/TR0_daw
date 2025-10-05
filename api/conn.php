@@ -1,9 +1,9 @@
 <?php
     //Datos de la conexion
-    $host = ""; // server address
-    $user = "";  //username db
-    $pass = "";  //password db
-    $db = "";  //database name
+    $host = "localhost"; // server address
+    $user = "root";  //username db
+    $pass = "admin123";  //password db
+    $db = "autoescola";  //database name
 
     //Creamos la conexion y seleccionamos la base de datos
     $conn = mysqli_connect($host, $user, $pass, $db);

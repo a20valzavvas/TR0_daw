@@ -5,13 +5,20 @@
     // Incluimos la conexión a la base de datos
     include 'conn.php'; 
     
-    //Número de preguntas a seleccionar (0 para todas) 
+    // Si es admin, traer todas las preguntas
     $isAdmin = isset($_GET['admin']) && $_GET['admin'] === 'true';
-
+    
+    // consultas SQL
     $sql = "SELECT * FROM preguntes ORDER BY RAND() LIMIT 2";
+    $sql_admin = "SELECT * FROM preguntes ORDER BY id ASC";
 
-    $result = mysqli_query($conn, $sql); 
+    // Elegimos la consulta según si es admin o no
+    $queryToRun = $isAdmin ? $sql_admin : $sql;
 
+    // Ejecutamos la consulta
+    $result = mysqli_query($conn, $queryToRun);
+
+    // Array para almacenar las preguntas y respuestas
     $preguntes = [];
     $response = [];
 

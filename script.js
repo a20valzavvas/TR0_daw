@@ -5,15 +5,15 @@
 const app = document.getElementById("app");
 
 let nomUsuari;
-let estatDeLaPartida = { 
+let estatDeLaPartida = {
     preguntaActual: 0,
-    contadorPreguntes: 0, 
+    contadorPreguntes: 0,
     preguntes: [],
-    respostesUsuari: [], 
-    tempsRestant:30
-}; 
+    respostesUsuari: [],
+    tempsRestant: 30
+};
 
-let idTimer = 0; 
+let idTimer = 0;
 
 /* ====================
    FUNCIONS AUXILIARS
@@ -25,7 +25,7 @@ function resetEstat() {
         preguntaActual: 0,
         contadorPreguntes: 0,
         preguntes: [],
-        respostesUsuari: [], 
+        respostesUsuari: [],
         tempsRestant: 30
     };
 }
@@ -36,8 +36,8 @@ function renderRespostes(pregunta, i) {
     return `
         <div class="pregunta-buttons">
             ${pregunta.respostes.map((resposta, j) =>
-                `<button onclick="marcarResposta(${i},${j})" id=${i}_${j} class="btn-primary">${resposta.resposta}</button>`
-            ).join("")}
+        `<button onclick="marcarResposta(${i},${j})" id=${i}_${j} class="btn-primary">${resposta.resposta}</button>`
+    ).join("")}
         </div>
     `;
 }
@@ -48,7 +48,7 @@ function renderPregunta(pregunta, i) {
     return `
         <div class="pregunta oculta" id=${i}>
             <h3>${pregunta.pregunta}</h3>
-            <img src="img/${pregunta.imatge}" alt="imatge pregunta ${i+1}" style="width: 150px; height: 150px;">
+            <img src="img/${pregunta.imatge}" alt="imatge pregunta ${i + 1}" style="width: 150px; height: 150px;">
             ${renderRespostes(pregunta, i)}
         </div>
         <br><br>
@@ -72,9 +72,9 @@ function renderMarcador() {
     html += `Jugador: ${nomUsuari} <br>`;
     html += `Temps límit de la partida: ${estatDeLaPartida.tempsRestant} segons <br>`;
     html += `Preguntes respostes ${estatDeLaPartida.contadorPreguntes}/${estatDeLaPartida.preguntes.length} <br>`;
-    
+
     estatDeLaPartida.respostesUsuari.forEach((r, i) => {
-        html += `<br> Pregunta ${i+1}: ${(r==undefined? "O":"X")}<br>`;
+        html += `<br> Pregunta ${i + 1}: ${(r == undefined ? "O" : "X")}<br>`;
     });
 
     html += `<div><button id="btnBorrar" class="btn-borrar">Borrar Partida</button></div>`;
@@ -86,7 +86,7 @@ function renderMarcador() {
 ======================*/
 
 // Render de la pantalla d'admin
-function renderAdmin(){
+function renderAdmin() {
     app.innerHTML = `
         <h1>Panel d'Administració</h1>
         <button id="backBtn"> Tornar </button>
@@ -96,13 +96,13 @@ function renderAdmin(){
 
     // Obrim esdeveniments als botons
     document.getElementById("backBtn").addEventListener("click", renderInici);
-    document.getElementById("addQuestionForm").addEventListener("click", afegirPregunta);
+    document.getElementById("addQuestionForm").addEventListener("click", renderFormPreguntaNova);
 
-    fetch('getPreguntes.php?admin=true')
+    fetch('api/getPreguntes.php?admin=true')
         .then(res => res.json())
         .then(data => {
             // Guardem preguntes en variable global
-            window.preguntesAdmin = data.preguntes; 
+            window.preguntesAdmin = data.preguntes;
             const container = document.getElementById("preguntesContainer");
             container.innerHTML = data.preguntes.map((p, i) => {
                 // Buscar el índice de la respuesta correcta
@@ -110,8 +110,9 @@ function renderAdmin(){
                 return `
                     <div class="preguntaItem">
                         <p><strong>${i + 1}. ${p.pregunta}</strong></p>
-                        <p>Respuestas: ${p.respostes.map((r, i) => `<br>${i + 1}. ${r.resposta}`).join("")}</p>
-                        <p>Correcta: ${correctaIndex !== -1 ? (correctaIndex + 1) : 'No definida'}</p>
+                        <img src="img/${p.imatge}" alt="imatge pregunta ${i + 1}" style="width: 150px; height: 150px;">
+                        <p>Respostes: ${p.respostes.map((r, i) => `<br>${i + 1}. ${r.resposta}`).join("")}</p>
+                        <p>Resposta Correcta: ${correctaIndex !== -1 ? (correctaIndex + 1) : 'No definida'}</p>
                         <button class="editarBtn" data-id="${p.id}">Editar</button>
                         <button class="eliminarBtn" data-id="${p.id}">Eliminar</button>
                         <hr>
@@ -140,18 +141,94 @@ function renderAdmin(){
 }
 
 // Funcio per afegir una nova pregunta
-function renderFormPreguntaNova(){
+function renderFormPreguntaNova() {
+
+
 
 }
 
 // Funcio per eliminar una pregunta
-function eliminarPregunta(id){
+function eliminarPregunta(id) {
 
 }
 
 // Render del formulari d'edició d'una pregunta
-function renderFormPregunta(id){
+function renderFormPregunta(id) {
+    // Buscamos la pregunta en el array global comparando como número
+    const pregunta = window.preguntesAdmin.find(p => Number(p.id) === Number(id));
+    if (!pregunta) {
+        alert('Pregunta no encontrada');
+        return;
+    }
+    // Construimos el formulario HTML
+    let html = `<h2>Editar pregunta</h2>
+        <form id="editPreguntaForm" enctype="multipart/form-data">
+            <label>Pregunta:<br>
+                <input type="text" name="pregunta" value="${pregunta.pregunta}" placeholder="Escriu aquí la teva pregunta" required>
+            </label><br><br>
+            <label>Imatge:<br>
+                <img src="img/${pregunta.imatge}" alt="imatge pregunta" style="width: 150px; height: 150px;">
+            </label><br><br>
+            <label>Selecciona una imatge:<br>
+                <input type="file" name="imatge" accept="image/*">
+            </label><br><br>
+            <fieldset>
+                <legend>Respostes</legend>`;
+    // Mostramos cada respuesta con su campo de texto y radio para marcar la correcta
+    pregunta.respostes.forEach((r, i) => {
+        html += `
+            <div>
+                <input type="radio" name="correcta" value="${i}" ${r.correcta ? 'checked' : ''}>
+                <input type="text" name="resposta${i}" value="${r.resposta}" placeholder="Escriu aquí la teva resposta" required>
+                <label> (Resposta ${i + 1})</label>
+            </div>`;
+    });
+    html += `
+            </fieldset>
+            <br>
+            <button type="submit">Guardar canvis</button>
+            <button type="button" id="cancelarBtn">Cancelar</button>
+        </form>`;
+    app.innerHTML = html;
 
+    // Evento para cancelar y volver a la vista de admin
+    document.getElementById('cancelarBtn').addEventListener('click', renderAdmin);
+
+    // Evento para guardar los cambios
+    document.getElementById('editPreguntaForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        formData.append('id', pregunta.id);
+
+        // Preparamos las respuestas con sus IDs
+        const respostesActualitzades = pregunta.respostes.map((r, i) => ({
+            id: r.id,
+            resposta: formData.get(`resposta${i}`),
+            correcta: formData.get('correcta') == i
+        }));
+
+        // Añadimos las respuestas como JSON al FormData
+        formData.append('respostes', JSON.stringify(respostesActualitzades));
+
+        // Enviamos al backend (sube imagen + actualiza BBDD)
+        fetch('api/editarPregunta.php', {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Pregunta actualitzada correctament');
+                    renderAdmin();
+                } else {
+                    alert('Error: ' + (result.error || 'Error desconegut'));
+                }
+            })
+            .catch(err => {
+                alert('Error de xarxa: ' + err);
+            });
+    });
 }
 
 /* =====================
@@ -159,7 +236,7 @@ function renderFormPregunta(id){
 =======================*/
 
 // Render de la pantalla inicial
-function renderInici(){
+function renderInici() {
     app.innerHTML = `
         <h1>Autoescola</h1>
         <button id="startBtn"> Començar </button>
@@ -185,7 +262,7 @@ function iniciarPartida() {
 
     // Comprovar si hi ha partida guardada
     const partidaGuardada = JSON.parse(localStorage.getItem(`partida_${nomUsuari}`));
-    
+
     if (partidaGuardada) {
         estatDeLaPartida = partidaGuardada;
         mostrarPreguntes(estatDeLaPartida.preguntes);
@@ -193,7 +270,7 @@ function iniciarPartida() {
     }
 
     // Cargar preguntas del servidor
-    fetch('getPreguntes.php')
+    fetch('api/getPreguntes.php')
         .then(res => res.json())
         .then(data => {
             estatDeLaPartida.preguntes = [...data.preguntes];
@@ -231,7 +308,7 @@ function EsborrarPartida() {
     resetEstat();
 
     // Cargar noves preguntes del servidor
-    fetch('getPreguntes.php')
+    fetch('api/getPreguntes.php')
         .then(res => res.json())
         .then(data => {
             estatDeLaPartida.preguntes = [...data.preguntes];
@@ -267,7 +344,7 @@ function marcarResposta(numPregunta, numResposta) {
 }
 
 // Actualitza marcador i guarda en localStorage
-function actualitzarMarcador(){
+function actualitzarMarcador() {
     document.getElementById("marcador").innerHTML = renderMarcador();
 
     // Marcar visualment respostes ja seleccionades
@@ -283,7 +360,7 @@ function actualitzarMarcador(){
 }
 
 // Timer
-function timer(){
+function timer() {
     // Si ja hi ha un timer, el netegem
     if (idTimer) clearInterval(idTimer);
 
@@ -303,9 +380,9 @@ function timer(){
 }
 
 // Envía estat al servidor
-function enviarEstat(manual = false) { 
+function enviarEstat(manual = false) {
     // Enviem dades al servidor
-    fetch("recollida.php", {
+    fetch("api/recollida.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -314,27 +391,27 @@ function enviarEstat(manual = false) {
             respostesUsuari: estatDeLaPartida.respostesUsuari
         })
     })
-    // Resposta del servidor
-    .then(res => res.text())
-    .then(data => {
-        console.log("Respostes enviades:", data);
-        
-        // Si s'ha enviat manualment, desactivar botó i mostrar missatge
-        if (manual) {
-            const btnEnviar = document.getElementById("btnEnviar");
-            // Desactivar botó enviar
-            if (btnEnviar) btnEnviar.style.display = "none";
+        // Resposta del servidor
+        .then(res => res.text())
+        .then(data => {
+            console.log("Respostes enviades:", data);
 
-            // Mostrar missatge enviat
-            const questionari = document.getElementById("questionari");
-            
-            // Evitar duplicats
-            if (questionari && !document.querySelector(".leyenda-enviades")) {
-                questionari.insertAdjacentHTML("beforeend", `<p class='leyenda-enviades'>Respostes enviades!</p>`);
+            // Si s'ha enviat manualment, desactivar botó i mostrar missatge
+            if (manual) {
+                const btnEnviar = document.getElementById("btnEnviar");
+                // Desactivar botó enviar
+                if (btnEnviar) btnEnviar.style.display = "none";
+
+                // Mostrar missatge enviat
+                const questionari = document.getElementById("questionari");
+
+                // Evitar duplicats
+                if (questionari && !document.querySelector(".leyenda-enviades")) {
+                    questionari.insertAdjacentHTML("beforeend", `<p class='leyenda-enviades'>Respostes enviades!</p>`);
+                }
             }
-        }
-    })
-    .catch(err => console.error("Error al enviar:", err));
+        })
+        .catch(err => console.error("Error al enviar:", err));
 }
 
 /* ======== INICI APP =======*/
