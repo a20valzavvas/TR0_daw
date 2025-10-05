@@ -19,3 +19,4 @@ $response = [
 // Mostramos como JSON para ver en consola del fetch
 header("Content-Type: application/json");
 echo json_encode($response);
+?>
