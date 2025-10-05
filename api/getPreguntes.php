@@ -9,7 +9,7 @@
     $isAdmin = isset($_GET['admin']) && $_GET['admin'] === 'true';
     
     // consultas SQL
-    $sql = "SELECT * FROM preguntes ORDER BY RAND() LIMIT 10";
+    $sql = "SELECT * FROM preguntes ORDER BY RAND() LIMIT 3";
     $sql_admin = "SELECT * FROM preguntes ORDER BY id ASC";
 
     // Escollim la consulta segons si es admin o no

@@ -385,3 +385,78 @@ button.seleccionada {
   margin-top: 20px;
   font-size: 18px;
 }
+
+/* ===== Resultat Final ===== */
+.resultat-final {
+  margin-top: 25px;
+  background: #f7f1ff;
+  border: 2px solid #e3d4fa;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  animation: fadeIn 0.5s ease;
+}
+
+.resultat-final h2 {
+  color: #7b4fa0;
+  margin-bottom: 10px;
+}
+
+.resultat-final p {
+  color: #5e4b63;
+  font-size: 1em;
+  margin: 5px 0;
+}
+
+/* ===== Resultats finals detallats ===== */
+.pregunta-resultat {
+  background: #fff;
+  border: 2px solid #f3e8f7;
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin: 14px 0;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  text-align: left;
+  animation: fadeIn 0.4s ease;
+}
+
+.pregunta-resultat h3 {
+  color: #6a4b75;
+  margin-bottom: 8px;
+}
+
+.pregunta-resultat p {
+  margin: 4px 0;
+  color: #5c4b51;
+  font-size: 0.95em;
+}
+
+.img-resultat {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin: 8px 0 12px;
+  border: 2px solid #f0d7f8;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.resultats-page {
+  background: #fffafc;
+  border-radius: 20px;
+  padding: 25px 30px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  animation: fadeIn 0.6s ease;
+}
+
+.resultats-page h1 {
+  color: #7b4fa0;
+  margin-bottom: 10px;
+}
+
+.resultats-page .missatge {
+  color: #7d6f74;
+  font-weight: 600;
+  margin: 12px 0;
+}

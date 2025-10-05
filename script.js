@@ -101,6 +101,59 @@ function renderMarcador() {
     return html;
 }
 
+// Render de la vista de resultats finals
+function renderResultatsFinals() {
+    const total = estatDeLaPartida.preguntes.length;
+    let correctes = 0;
+
+    // Comptar encerts
+    estatDeLaPartida.preguntes.forEach((p, i) => {
+        const respostaUsuari = estatDeLaPartida.respostesUsuari[i];
+        if (respostaUsuari !== undefined && p.respostes[respostaUsuari]?.correcta) correctes++;
+    });
+
+    const percentatge = total ? Math.round((correctes / total) * 100) : 0;
+    const missatge = percentatge >= 70 ? "Excel·lent feina!" : "Continua practicant!";
+
+    // Vista SPA de resultats: reemplaça el contingut de #app
+    app.innerHTML = `
+        <div class="resultats-page">
+            <h1>Resultats Finals</h1>
+            <p class="usuari">Jugador: <strong>${nomUsuari}</strong></p>
+            <p class="resum">Has encertat <strong>${correctes}</strong> de <strong>${total}</strong> preguntes (${percentatge}%)</p>
+            <p class="missatge">${missatge}</p>
+
+            <div class="llista-resultats">
+                ${estatDeLaPartida.preguntes.map((p, i) => {
+                    const respostaUsuari = estatDeLaPartida.respostesUsuari[i];
+                    return `
+                        <div class="pregunta-resultat">
+                            <h3>${i + 1}. ${p.pregunta}</h3>
+                            ${p.imatge ? `<img src="img/${p.imatge}" alt="Pregunta ${i + 1}" class="img-resultat">` : ""}
+                            <ul>
+                                ${p.respostes.map((r, j) => `
+                                    <li class="${
+                                        r.correcta ? 'correcta' : (respostaUsuari === j ? 'incorrecta' : '')
+                                    }">
+                                        ${r.resposta}
+                                        ${r.correcta ? ' ✅' : (respostaUsuari === j ? ' ❌' : '')}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+
+            <button id="btnTornar" class="btn-primary">Tornar a l'inici</button>
+        </div>
+    `;
+
+    // Enllaç per retornar a l'inici
+    document.getElementById("btnTornar").addEventListener("click", renderInici);
+}
+
+
 /*====================
    FUNCIONS ADMIN
 ======================*/
@@ -253,6 +306,85 @@ function eliminarPregunta(id) {
         .catch(err => alert('Error de xarxa: ' + err));
 }
 
+// Render del formulari d'edició d'una pregunta
+function renderFormPregunta(id) {
+    // Buscamos la pregunta en el array global comparando como número
+    const pregunta = window.preguntesAdmin.find(p => Number(p.id) === Number(id));
+    if (!pregunta) {
+        alert('Pregunta no encontrada');
+        return;
+    }
+    // Construimos el formulario HTML
+    let html = `<h2>Editar pregunta</h2>
+        <form id="editPreguntaForm" enctype="multipart/form-data">
+            <label>Pregunta:<br>
+                <input type="text" name="pregunta" value="${pregunta.pregunta}" placeholder="Escriu aquí la teva pregunta" required>
+            </label><br><br>
+            <label>Imatge:<br>
+                <img src="img/${pregunta.imatge}" alt="imatge pregunta" style="width: 150px; height: 150px;">
+            </label><br><br>
+            <label>Selecciona una imatge:<br>
+                <input type="file" name="imatge" accept="image/*">
+            </label><br><br>
+            <fieldset>
+                <legend>Respostes</legend>`;
+    // Mostramos cada respuesta con su campo de texto y radio para marcar la correcta
+    pregunta.respostes.forEach((r, i) => {
+        html += `
+            <div>
+                <input type="radio" name="correcta" value="${i}" ${r.correcta ? 'checked' : ''}>
+                <input type="text" name="resposta${i}" value="${r.resposta}" placeholder="Escriu aquí la teva resposta" required>
+                <label> (Resposta ${i + 1})</label>
+            </div>`;
+    });
+    html += `
+            </fieldset>
+            <br>
+            <button type="submit">Guardar canvis</button>
+            <button type="button" id="cancelarBtn">Cancelar</button>
+        </form>`;
+    app.innerHTML = html;
+
+    // Evento para cancelar y volver a la vista de admin
+    document.getElementById('cancelarBtn').addEventListener('click', renderAdmin);
+
+    // Evento para guardar los cambios
+    document.getElementById('editPreguntaForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        formData.append('id', pregunta.id);
+
+        // Preparamos las respuestas con sus IDs
+        const respostesActualitzades = pregunta.respostes.map((r, i) => ({
+            id: r.id,
+            resposta: formData.get(`resposta${i}`),
+            correcta: formData.get('correcta') == i
+        }));
+
+        // Añadimos las respuestas como JSON al FormData
+        formData.append('respostes', JSON.stringify(respostesActualitzades));
+
+        // Enviamos al backend (sube imagen + actualiza BBDD)
+        fetch('api/editarPregunta.php', {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Pregunta actualitzada correctament');
+                    renderAdmin();
+                } else {
+                    alert('Error: ' + (result.error || 'Error desconegut'));
+                }
+            })
+            .catch(err => {
+                alert('Error de xarxa: ' + err);
+            });
+    });
+}
+
 /* =====================
    FUNCIONS PRINCIPALS
 =======================*/
@@ -384,6 +516,86 @@ function actualitzarMarcador() {
     localStorage.setItem(`partida_${nomUsuari}`, JSON.stringify(estatDeLaPartida));
 }
 
+// Mostra la puntuació final
+function mostrarPuntuacioFinal() {
+    // Obtenim preguntes reals amb respostes correctes (admin=true)
+    fetch("api/getPreguntes.php?admin=true")
+        .then(res => res.json())
+        .then(data => {
+            const preguntesCorrectes = data.preguntes;
+            const total = estatDeLaPartida.preguntes.length;
+            let correctes = 0;
+
+            // Compareu respostes de l'usuari amb les correctes de la BBDD
+            estatDeLaPartida.preguntes.forEach((p, i) => {
+                const respostaUsuari = estatDeLaPartida.respostesUsuari[i];
+                const preguntaServer = preguntesCorrectes.find(q => q.id === p.id);
+                if (!preguntaServer) return;
+
+                const respostaCorrectaIndex = preguntaServer.respostes.findIndex(r => r.correcta);
+                if (respostaUsuari === respostaCorrectaIndex) correctes++;
+            });
+
+            const percentatge = Math.round((correctes / total) * 100);
+
+            let msgUser = "";
+            if (percentatge === 100) msgUser = "Excel·lent! Has encertat totes les preguntes!";
+            else if (percentatge >= 70) msgUser = "Molt bé! Gairebé estàs llest per conduir!";
+            else if (percentatge >= 40) msgUser = "Segueix practicant!";
+            else msgUser = "No et rendeixis! Revisa les preguntes i torna-ho a intentar.";
+
+            // Detall (sense mostrar la resposta correcta)
+            const detallsHTML = estatDeLaPartida.preguntes.map((p, i) => {
+                const respostaUsuari = estatDeLaPartida.respostesUsuari[i];
+                const preguntaServer = preguntesCorrectes.find(q => q.id === p.id);
+                if (!preguntaServer) return "";
+
+                const respostaCorrectaIndex = preguntaServer.respostes.findIndex(r => r.correcta);
+                const respostaTextUsuari = respostaUsuari !== undefined ? p.respostes[respostaUsuari].resposta : "Sense resposta";
+                const esCorrecte = respostaUsuari === respostaCorrectaIndex;
+
+                return `
+                    <div class="pregunta-resultat">
+                        <h3>${i + 1}. ${p.pregunta}</h3>
+                        ${p.imatge ? `<img src="img/${p.imatge}" alt="Pregunta ${i + 1}" class="img-resultat">` : ""}
+                        <p><strong>La teva resposta:</strong> ${respostaTextUsuari}</p>
+                        <p style="color:${esCorrecte ? '#2e7d32' : '#c62828'};">
+                            ${esCorrecte ? '✔ Correcte' : '✖ Incorrecte'}
+                        </p>
+                    </div>
+                `;
+            }).join('');
+
+            // Render final
+            app.innerHTML = `
+                <div class="resultats-page">
+                    <h1>Resultat Final</h1>
+                    <p class="usuari"><strong>Jugador:</strong> ${nomUsuari}</p>
+                    <p class="resum">Has encertat <strong>${correctes}</strong> de <strong>${total}</strong> preguntes (${percentatge}%)</p>
+                    <p class="missatge">${msgUser}</p>
+                    <hr>
+                    <div class="llista-resultats">
+                        ${detallsHTML}
+                    </div>
+                    <div style="margin-top:25px;">
+                        <button id="btnReiniciar" class="btn-primary">Tornar a intentar</button>
+                        <button id="btnSortir" class="btn-borrar">Sortir</button>
+                    </div>
+                </div>
+            `;
+
+            // Botons
+            document.getElementById("btnReiniciar").addEventListener("click", () => {
+                resetEstat();
+                iniciarPartida();
+            });
+            document.getElementById("btnSortir").addEventListener("click", () => {
+                resetEstat();
+                renderInici();
+            });
+        })
+        .catch(err => console.error("Error al obtenir preguntes correctes:", err));
+}
 
 // Temporitzador amb actualització de barra
 function timer() {
@@ -401,7 +613,7 @@ function timer() {
     }, 1000);
 }
 
-// Envia estat al servidor
+// Envia estat al servidor i mostra puntuació final
 function enviarEstat(manual = false) {
     fetch("api/recollida.php", {
         method: "POST",
@@ -422,7 +634,11 @@ function enviarEstat(manual = false) {
                 const questionari = document.getElementById("questionari");
 
                 if (questionari && !document.querySelector(".leyenda-enviades")) {
-                    questionari.insertAdjacentHTML("beforeend", `<p class='leyenda-enviades'>Respostes enviades!</p>`);
+                    questionari.insertAdjacentHTML("beforeend", `
+                        <p class='leyenda-enviades'>Respostes enviades!</p>
+                        <button id="btnPuntuacio" class="btn-primary">Veure puntuació final</button>
+                    `);
+                    document.getElementById("btnPuntuacio").addEventListener("click", mostrarPuntuacioFinal);
                 }
             }
         })
