@@ -1,0 +1,166 @@
+/* ===== Estilos generales ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Quicksand', sans-serif;
+  background: linear-gradient(135deg, #ffe6f2, #e6f0ff);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+  color: #5c4b51;
+}
+
+/* ===== Contenedor principal ===== */
+#app {
+  background: #fffafc;
+  padding: 40px 30px;
+  border-radius: 24px;
+  box-shadow: 0px 6px 20px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  animation: fadeIn 0.6s ease;
+}
+
+h1 {
+  font-size: 2.4em;
+  margin-bottom: 10px;
+}
+
+h2 {
+  margin: 20px 0 15px;
+  font-size: 1.4em;
+}
+
+h3 {
+  margin-top: 15px;
+  font-size: 1.1em;
+  color: #7d6f74;
+}
+
+p {
+  margin: 15px 0;
+  color: #7d6f74;
+}
+
+/* ===== Botones ===== */
+button {
+  border: none;
+  padding: 12px 22px;
+  margin: 8px;
+  border-radius: 30px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.btn-borrar {
+  background: #ffcccc;
+  color: #800000;
+}
+
+#startBtn,
+.start,
+.btn-primary {
+  background: #ffcce7;
+  color: #5c4b51;
+}
+
+#adminBtn,
+.admin {
+  background: #d8eaff;
+  color: #4b5563;
+}
+
+#btnEnviar {
+  background: #c1ffd7;
+  color: #256348;
+  display: none;
+}
+
+#btnEnviar:disabled {
+  background: #a8d5b2;  
+  color: #4a6651;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+}
+
+button:disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+button.seleccionada {
+    border: 2px solid #de3486;
+}
+
+/* ===== Preguntas ===== */
+#questionari {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.pregunta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+ 
+.pregunta img {
+    margin: 10px 0;
+}
+
+/* 👉 2 columnas fijas simétricas */
+.pregunta-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* dos columnas iguales */
+  gap: 12px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.pregunta-buttons button {
+  width: 100%;
+  margin: 0; /* usamos el gap del grid */
+  text-align: center;
+  padding: 12px;
+}
+
+/* ===== Marcador ===== */
+#marcador {
+  margin-top: 25px;
+  background: #f8f4ff;
+  padding: 15px;
+  border-radius: 16px;
+  font-size: 0.95em;
+  text-align: left;
+}
+
+/* ===== Animaciones suaves ===== */
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+.leyenda-enviades {
+    color: #28a745;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+    font-size: 18px;
+}
