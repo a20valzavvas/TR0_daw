@@ -1,0 +1,114 @@
+{
+  "preguntes": [
+    {
+      "id": 1,
+      "pregunta": "Quin és el límit de velocitat en vies urbanes si no s'indica el contrari?",
+      "respostes": [
+        { "id": 1, "resposta": "50 km/h", "correcta": true },
+        { "id": 2, "resposta": "60 km/h", "correcta": false },
+        { "id": 3, "resposta": "40 km/h", "correcta": false },
+        { "id": 4, "resposta": "30 km/h", "correcta": false }
+      ],
+      "imatge": "velocitat_urbana.jpg"
+    },
+    {
+      "id": 2,
+      "pregunta": "Quan s'ha d'utilitzar el senyal d'emergència?",
+      "respostes": [
+        { "id": 1, "resposta": "Només en cas d'accident", "correcta": false },
+        { "id": 2, "resposta": "Quan es circula lentament", "correcta": false },
+        { "id": 3, "resposta": "Quan el vehicle està aturat i és un perill", "correcta": true },
+        { "id": 4, "resposta": "Quan s'aparca en pendent", "correcta": false }
+      ],
+      "imatge": "emergencia.jpeg"
+    },
+    {
+      "id": 3,
+      "pregunta": "Què indica una línia contínua al centre de la calçada?",
+      "respostes": [
+        { "id": 1, "resposta": "Es pot avançar si no ve ningú", "correcta": false },
+        { "id": 2, "resposta": "Prohibició de creuar o avançar", "correcta": true },
+        { "id": 3, "resposta": "Fi de prohibició", "correcta": false },
+        { "id": 4, "resposta": "Zona d'aparcament", "correcta": false }
+      ],
+      "imatge": "continua.jpeg"
+    },
+    {
+      "id": 4,
+      "pregunta": "Quin document és obligatori portar sempre en conduir?",
+      "respostes": [
+        { "id": 1, "resposta": "Llibre de revisions del cotxe", "correcta": false },
+        { "id": 2, "resposta": "Permís de conduir", "correcta": true },
+        { "id": 3, "resposta": "Factura de compra", "correcta": false },
+        { "id": 4, "resposta": "Carnet de la ITV antiga", "correcta": false }
+      ],
+      "imatge": "documents.jpg"
+    },
+    {
+      "id": 5,
+      "pregunta": "Què cal fer davant d'un semàfor amb llum groga intermitent?",
+      "respostes": [
+        { "id": 1, "resposta": "Parar obligatòriament", "correcta": false },
+        { "id": 2, "resposta": "Passar ràpidament", "correcta": false },
+        { "id": 3, "resposta": "Cedir el pas i continuar amb precaució", "correcta": true },
+        { "id": 4, "resposta": "Esperar la llum verda", "correcta": false }
+      ],
+      "imatge": "semaforo.jpeg"
+    },
+    {
+      "id": 6,
+      "pregunta": "Quan s’ha d’usar el cinturó de seguretat?",
+      "respostes": [
+        { "id": 1, "resposta": "Només en autopista", "correcta": false },
+        { "id": 2, "resposta": "Només el conductor", "correcta": false },
+        { "id": 3, "resposta": "En tot moment i per tots els ocupants", "correcta": true },
+        { "id": 4, "resposta": "En trajectes llargs", "correcta": false }
+      ],
+      "imatge": "cinturo.jpg"
+    },
+    {
+      "id": 7,
+      "pregunta": "Què indica aquest senyal: triangle amb un cotxe derrapant?",
+      "respostes": [
+        { "id": 1, "resposta": "Zona de frenada", "correcta": false },
+        { "id": 2, "resposta": "Perill per paviment lliscant", "correcta": true },
+        { "id": 3, "resposta": "Obres a la via", "correcta": false },
+        { "id": 4, "resposta": "Pas de vianants", "correcta": false }
+      ],
+      "imatge": "paviment_lliscant.png"
+    },
+    {
+      "id": 8,
+      "pregunta": "A quina distància mínima s'ha de senyalitzar una avaria en carretera?",
+      "respostes": [
+        { "id": 1, "resposta": "10 metres", "correcta": false },
+        { "id": 2, "resposta": "50 metres", "correcta": true },
+        { "id": 3, "resposta": "5 metres", "correcta": false },
+        { "id": 4, "resposta": "100 metres", "correcta": false }
+      ],
+      "imatge": "averia.jpg"
+    },
+    {
+      "id": 9,
+      "pregunta": "Quina és la funció principal dels llums de posició?",
+      "respostes": [
+        { "id": 1, "resposta": "Il·luminar la via", "correcta": false },
+        { "id": 2, "resposta": "Fer més visible el vehicle aturat", "correcta": true },
+        { "id": 3, "resposta": "Assenyalar un gir", "correcta": false },
+        { "id": 4, "resposta": "Evitar l'encesa dels fars", "correcta": false }
+      ],
+      "imatge": "posicion.jpg"
+    },
+    {
+      "id": 10,
+      "pregunta": "Quina maniobra està prohibida en una línia discontínua curta i molt seguida?",
+      "respostes": [
+        { "id": 1, "resposta": "Canviar de carril", "correcta": false },
+        { "id": 2, "resposta": "Avançar", "correcta": true },
+        { "id": 3, "resposta": "Girar a l'esquerra", "correcta": false },
+        { "id": 4, "resposta": "Parar", "correcta": false }
+      ],
+      "imatge": "discontinua.jpg"
+    }
+  ]
+}
