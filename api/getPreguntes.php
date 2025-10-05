@@ -1,48 +1,48 @@
 <?php
-    //Indicamos que la respuesta será JSON
+    //Indiquem que la resposta sera JSON
     header('Content-Type: application/json'); 
     
-    // Incluimos la conexión a la base de datos
+    // Incluim la conexió a la base de dades
     include 'conn.php'; 
     
-    // Si es admin, traer todas las preguntas
+    // Si es admin, portar totes les preguntes
     $isAdmin = isset($_GET['admin']) && $_GET['admin'] === 'true';
     
     // consultas SQL
     $sql = "SELECT * FROM preguntes ORDER BY RAND() LIMIT 2";
     $sql_admin = "SELECT * FROM preguntes ORDER BY id ASC";
 
-    // Elegimos la consulta según si es admin o no
+    // Escollim la consulta segons si es admin o no
     $queryToRun = $isAdmin ? $sql_admin : $sql;
 
-    // Ejecutamos la consulta
+    // Executem la consulta
     $result = mysqli_query($conn, $queryToRun);
 
-    // Array para almacenar las preguntas y respuestas
+    // Array per guardar les preguntes i respostes
     $preguntes = [];
     $response = [];
 
-    //recorremos las preguntas
+    //recorrem les preguntes
     while ($row = mysqli_fetch_assoc($result)) {
         $preguntaId = $row['id'];
         $pregunta = $row['pregunta'];
         $img = $row['imatge'];
 
-        // Obtenemos respuestas para esta pregunta
+        // Obtenim respostes per aquesta pregunta
         $sqlRes = "SELECT id, resposta, correcta FROM respostes WHERE pregunta_id = $preguntaId ORDER BY id ASC";
-        // Ejecutamos la consulta
+        // Executem la consulta
         $resRes = mysqli_query($conn, $sqlRes);
 
         $respostes = [];
 
-        //recorremos las respuestas
+        //recorrem les respostes
         while ($r = mysqli_fetch_assoc($resRes)) {
             $resposta = [
                 "id" => $r['id'],
                 "resposta" => $r['resposta']
             ];
             if ($isAdmin) {
-                // Si es admin, incluimos si es correcta
+                // Si es admin, incluim si es correcta
                 $resposta["correcta"] = (bool)$r['correcta'];
             }
             $respostes[] = $resposta;
@@ -60,6 +60,6 @@
         ];
     }
 
-    // Devolvemos en formato JSON
+    // Retornem en format JSON
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 ?>

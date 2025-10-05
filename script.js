@@ -88,7 +88,7 @@ function renderMarcador() {
 // Render de la pantalla d'admin
 function renderAdmin() {
     app.innerHTML = `
-        <h1>Panel d'Administració</h1>
+        <h1>Panell d'Administració</h1>
         <button id="backBtn"> Tornar </button>
         <button id="addQuestionForm">Crear Nova Pregunta</button>
         <div id="preguntesContainer"></div>
@@ -142,14 +142,104 @@ function renderAdmin() {
 
 // Funcio per afegir una nova pregunta
 function renderFormPreguntaNova() {
+    let html = `
+        <h2>Crear nova pregunta</h2>
+        <form id="novaPreguntaForm" enctype="multipart/form-data">
+            <label>Pregunta:<br>
+                <input type="text" name="pregunta" placeholder="Escriu aquí la pregunta" required>
+            </label><br><br>
 
+            <label>Selecciona una imatge (opcional):<br>
+                <input type="file" name="imatge" accept="image/*">
+            </label><br><br>
 
+            <fieldset>
+                <legend>Respostes</legend>
+    `;
 
+    // 4 respuestas por defecto
+    for (let i = 0; i < 4; i++) {
+        html += `
+            <div>
+                <input type="radio" name="correcta" value="${i}" ${i === 0 ? 'checked' : ''}>
+                <input type="text" name="resposta${i}" placeholder="Escriu aquí la resposta ${i + 1}" required>
+            </div>
+        `;
+    }
+
+    html += `
+            </fieldset><br>
+            <button type="submit">Guardar pregunta</button>
+            <button type="button" id="cancelarBtn">Cancelar</button>
+        </form>
+    `;
+
+    app.innerHTML = html;
+
+    // Botón cancelar → volver al panel admin
+    document.getElementById('cancelarBtn').addEventListener('click', renderAdmin);
+
+    // Evento enviar formulario
+    document.getElementById('novaPreguntaForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        // Recoger respuestas
+        const respostes = [];
+        for (let i = 0; i < 4; i++) {
+            respostes.push({
+                resposta: formData.get(`resposta${i}`),
+                correcta: formData.get('correcta') == i
+            });
+        }
+
+        formData.append('respostes', JSON.stringify(respostes));
+
+        fetch('api/crearPregunta.php', {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Pregunta creada correctament');
+                    // 🔄 Recargar lista actualizada sin recargar toda la página
+                    renderAdmin();
+                } else {
+                    alert('Error: ' + (result.error || 'Error desconegut'));
+                }
+            })
+            .catch(err => {
+                alert('Error de xarxa: ' + err);
+            });
+    });
 }
 
 // Funcio per eliminar una pregunta
 function eliminarPregunta(id) {
+    // Confirmació abans d'eliminar
+    if (!confirm("Segur que vols eliminar aquesta pregunta?")) return;
 
+    // Enviem la sol·licitud al servidor
+    fetch('api/eliminarPregunta.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }) // Passem l'ID en format JSON
+    })
+        .then(res => res.json())
+        .then(result => {
+            if (result.success) {
+                alert('Pregunta eliminada correctament');
+                // Tornem a renderitzar el panell d'administració per veure la llista actualitzada
+                renderAdmin();
+            } else {
+                alert('Error: ' + (result.error || 'No s\'ha pogut eliminar la pregunta'));
+            }
+        })
+        .catch(err => {
+            alert('Error de xarxa: ' + err);
+        });
 }
 
 // Render del formulari d'edició d'una pregunta
@@ -238,7 +328,7 @@ function renderFormPregunta(id) {
 // Render de la pantalla inicial
 function renderInici() {
     app.innerHTML = `
-        <h1>Autoescola</h1>
+        <h1>Autoescola UMDP</h1>
         <button id="startBtn"> Començar </button>
         <button id="adminBtn"> Administrar preguntas </button>
     `;
