@@ -66,18 +66,38 @@ function renderPreguntes(preguntes) {
     `;
 }
 
-// Mostra el marcador de la partida
+// Mostra el marcador de la partida amb barra de progrés
 function renderMarcador() {
-    let html = `<h3>Marcador de la partida</h3>`;
-    html += `Jugador: ${nomUsuari} <br>`;
-    html += `Temps límit de la partida: ${estatDeLaPartida.tempsRestant} segons <br>`;
-    html += `Preguntes respostes ${estatDeLaPartida.contadorPreguntes}/${estatDeLaPartida.preguntes.length} <br>`;
+    const totalTemps = 30;
+    const tempsPercent = (estatDeLaPartida.tempsRestant / totalTemps) * 100;
+    const totalPreguntes = estatDeLaPartida.preguntes.length;
+    const respostes = estatDeLaPartida.respostesUsuari;
 
-    estatDeLaPartida.respostesUsuari.forEach((r, i) => {
-        html += `<br> Pregunta ${i + 1}: ${(r == undefined ? "O" : "X")}<br>`;
-    });
+    // Generem els bullets segons si la pregunta ja s'ha respost o no
+    let bulletsHTML = '';
+    for (let i = 0; i < totalPreguntes; i++) {
+        const contestada = respostes[i] !== undefined;
+        bulletsHTML += `<span class="bullet ${contestada ? 'resposta' : ''}"></span>`;
+    }
 
-    html += `<div><button id="btnBorrar" class="btn-borrar">Borrar Partida</button></div>`;
+    let html = `
+        <h3>Marcador de la partida</h3>
+        <p><strong>Jugador:</strong> ${nomUsuari}</p>
+
+        <!-- Barra de progrés del temps -->
+        <div class="progress-container">
+            <div class="progress-bar temps" style="width: ${tempsPercent}%;"></div>
+        </div>
+        <p class="temps-text">${estatDeLaPartida.tempsRestant} segons restants</p>
+
+        <!-- Bullets de preguntes -->
+        <div class="bullets-container">
+            ${bulletsHTML}
+        </div>
+        <p class="temps-text">Preguntes respostes: ${respostes.filter(r => r !== undefined).length}/${totalPreguntes}</p>
+
+        <button id="btnBorrar" class="btn-borrar">Esborrar Partida</button>
+    `;
     return html;
 }
 
@@ -88,9 +108,13 @@ function renderMarcador() {
 // Render de la pantalla d'admin
 function renderAdmin() {
     app.innerHTML = `
-        <h1>Panell d'Administració</h1>
-        <button id="backBtn"> Tornar </button>
-        <button id="addQuestionForm">Crear Nova Pregunta</button>
+        <div class="admin-header">
+            <h1>Panell d'Administració</h1>
+            <div class="admin-buttons">
+                <button id="backBtn" class="admin back">← Tornar</button>
+                <button id="addQuestionForm" class="admin add">+ Crear Nova Pregunta</button>
+            </div>
+        </div>
         <div id="preguntesContainer"></div>
     `;
 
@@ -115,12 +139,11 @@ function renderAdmin() {
                         <p>Resposta Correcta: ${correctaIndex !== -1 ? (correctaIndex + 1) : 'No definida'}</p>
                         <button class="editarBtn" data-id="${p.id}">Editar</button>
                         <button class="eliminarBtn" data-id="${p.id}">Eliminar</button>
-                        <hr>
                     </div>
                 `;
             }).join('');
 
-            // Añadir eventos a los botones de eliminar
+            // Afegim events als botons eliminar i editar
             container.querySelectorAll('.eliminarBtn').forEach(btn => {
                 btn.addEventListener('click', function () {
                     const id = parseInt(this.getAttribute('data-id'));
@@ -128,19 +151,16 @@ function renderAdmin() {
                 });
             });
 
-            // Añadimos el evento a los botones de editar
             document.querySelectorAll('.editarBtn').forEach(btn => {
                 btn.addEventListener('click', function () {
                     const id = parseInt(this.getAttribute('data-id'));
                     renderFormPregunta(id);
                 });
             });
-        })
-
-
+        });
 }
 
-// Funcio per afegir una nova pregunta
+// Funció per afegir una nova pregunta
 function renderFormPreguntaNova() {
     let html = `
         <h2>Crear nova pregunta</h2>
@@ -157,7 +177,7 @@ function renderFormPreguntaNova() {
                 <legend>Respostes</legend>
     `;
 
-    // 4 respuestas por defecto
+    // 4 respostes per defecte
     for (let i = 0; i < 4; i++) {
         html += `
             <div>
@@ -176,17 +196,16 @@ function renderFormPreguntaNova() {
 
     app.innerHTML = html;
 
-    // Botón cancelar → volver al panel admin
+    // Botó cancel·lar → tornar al panell admin
     document.getElementById('cancelarBtn').addEventListener('click', renderAdmin);
 
-    // Evento enviar formulario
+    // Enviament del formulari
     document.getElementById('novaPreguntaForm').addEventListener('submit', function (e) {
         e.preventDefault();
 
         const formData = new FormData(this);
-
-        // Recoger respuestas
         const respostes = [];
+
         for (let i = 0; i < 4; i++) {
             respostes.push({
                 resposta: formData.get(`resposta${i}`),
@@ -204,121 +223,34 @@ function renderFormPreguntaNova() {
             .then(result => {
                 if (result.success) {
                     alert('Pregunta creada correctament');
-                    // 🔄 Recargar lista actualizada sin recargar toda la página
                     renderAdmin();
                 } else {
                     alert('Error: ' + (result.error || 'Error desconegut'));
                 }
             })
-            .catch(err => {
-                alert('Error de xarxa: ' + err);
-            });
+            .catch(err => alert('Error de xarxa: ' + err));
     });
 }
 
-// Funcio per eliminar una pregunta
+// Funció per eliminar una pregunta
 function eliminarPregunta(id) {
-    // Confirmació abans d'eliminar
     if (!confirm("Segur que vols eliminar aquesta pregunta?")) return;
 
-    // Enviem la sol·licitud al servidor
     fetch('api/eliminarPregunta.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }) // Passem l'ID en format JSON
+        body: JSON.stringify({ id })
     })
         .then(res => res.json())
         .then(result => {
             if (result.success) {
                 alert('Pregunta eliminada correctament');
-                // Tornem a renderitzar el panell d'administració per veure la llista actualitzada
                 renderAdmin();
             } else {
                 alert('Error: ' + (result.error || 'No s\'ha pogut eliminar la pregunta'));
             }
         })
-        .catch(err => {
-            alert('Error de xarxa: ' + err);
-        });
-}
-
-// Render del formulari d'edició d'una pregunta
-function renderFormPregunta(id) {
-    // Buscamos la pregunta en el array global comparando como número
-    const pregunta = window.preguntesAdmin.find(p => Number(p.id) === Number(id));
-    if (!pregunta) {
-        alert('Pregunta no encontrada');
-        return;
-    }
-    // Construimos el formulario HTML
-    let html = `<h2>Editar pregunta</h2>
-        <form id="editPreguntaForm" enctype="multipart/form-data">
-            <label>Pregunta:<br>
-                <input type="text" name="pregunta" value="${pregunta.pregunta}" placeholder="Escriu aquí la teva pregunta" required>
-            </label><br><br>
-            <label>Imatge:<br>
-                <img src="img/${pregunta.imatge}" alt="imatge pregunta" style="width: 150px; height: 150px;">
-            </label><br><br>
-            <label>Selecciona una imatge:<br>
-                <input type="file" name="imatge" accept="image/*">
-            </label><br><br>
-            <fieldset>
-                <legend>Respostes</legend>`;
-    // Mostramos cada respuesta con su campo de texto y radio para marcar la correcta
-    pregunta.respostes.forEach((r, i) => {
-        html += `
-            <div>
-                <input type="radio" name="correcta" value="${i}" ${r.correcta ? 'checked' : ''}>
-                <input type="text" name="resposta${i}" value="${r.resposta}" placeholder="Escriu aquí la teva resposta" required>
-                <label> (Resposta ${i + 1})</label>
-            </div>`;
-    });
-    html += `
-            </fieldset>
-            <br>
-            <button type="submit">Guardar canvis</button>
-            <button type="button" id="cancelarBtn">Cancelar</button>
-        </form>`;
-    app.innerHTML = html;
-
-    // Evento para cancelar y volver a la vista de admin
-    document.getElementById('cancelarBtn').addEventListener('click', renderAdmin);
-
-    // Evento para guardar los cambios
-    document.getElementById('editPreguntaForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-        formData.append('id', pregunta.id);
-
-        // Preparamos las respuestas con sus IDs
-        const respostesActualitzades = pregunta.respostes.map((r, i) => ({
-            id: r.id,
-            resposta: formData.get(`resposta${i}`),
-            correcta: formData.get('correcta') == i
-        }));
-
-        // Añadimos las respuestas como JSON al FormData
-        formData.append('respostes', JSON.stringify(respostesActualitzades));
-
-        // Enviamos al backend (sube imagen + actualiza BBDD)
-        fetch('api/editarPregunta.php', {
-            method: 'POST',
-            body: formData
-        })
-            .then(res => res.json())
-            .then(result => {
-                if (result.success) {
-                    alert('Pregunta actualitzada correctament');
-                    renderAdmin();
-                } else {
-                    alert('Error: ' + (result.error || 'Error desconegut'));
-                }
-            })
-            .catch(err => {
-                alert('Error de xarxa: ' + err);
-            });
-    });
+        .catch(err => alert('Error de xarxa: ' + err));
 }
 
 /* =====================
@@ -330,27 +262,24 @@ function renderInici() {
     app.innerHTML = `
         <h1>Autoescola UMDP</h1>
         <button id="startBtn"> Començar </button>
-        <button id="adminBtn"> Administrar preguntas </button>
+        <button id="adminBtn"> Administrar preguntes </button>
     `;
 
     document.getElementById("startBtn").addEventListener("click", iniciarPartida);
     document.getElementById("adminBtn").addEventListener("click", renderAdmin);
 }
 
-// Inicia partida nova o carga la partida guardada
+// Inicia partida nova o carrega la partida guardada
 function iniciarPartida() {
     nomUsuari = prompt(`Benvingut! \n\n Introdueix el teu nom:`);
 
-    // Comprovar si el nom d'usuari és vàlid
     if (!nomUsuari) return;
 
-    // Validar nom usuari (mínim 3 caràcters, sense símbols especials)
     if (nomUsuari.trim().length < 3 || !/^[a-zA-Z0-9_]+$/.test(nomUsuari)) {
         alert("Si us plau, introdueix un nom d'usuari vàlid (mínim 3 caràcters, sense símbols especials).");
         return;
     }
 
-    // Comprovar si hi ha partida guardada
     const partidaGuardada = JSON.parse(localStorage.getItem(`partida_${nomUsuari}`));
 
     if (partidaGuardada) {
@@ -359,7 +288,6 @@ function iniciarPartida() {
         return;
     }
 
-    // Cargar preguntas del servidor
     fetch('api/getPreguntes.php')
         .then(res => res.json())
         .then(data => {
@@ -369,13 +297,11 @@ function iniciarPartida() {
         });
 }
 
-// Render preguntes + marcador
+// Render de les preguntes + marcador
 function mostrarPreguntes(preguntes) {
     app.innerHTML = renderPreguntes(preguntes);
     app.innerHTML += `<div id="marcador">${renderMarcador()}</div>`;
 
-
-    // Afegim esdeveniments (eventos) als botons
     document.getElementById("btnEnviar").addEventListener("click", function () {
         clearInterval(idTimer);
         enviarEstat(true);
@@ -384,7 +310,6 @@ function mostrarPreguntes(preguntes) {
 
     document.getElementById("btnBorrar").addEventListener("click", EsborrarPartida);
 
-    // Iniciar timer i actualitzar marcador
     timer();
     actualitzarMarcador();
 }
@@ -393,11 +318,9 @@ function mostrarPreguntes(preguntes) {
 function EsborrarPartida() {
     if (!confirm("Segur que vols esborrar la partida?")) return;
 
-    // Esborrar localStorage i reiniciar estat
     localStorage.removeItem(`partida_${nomUsuari}`);
     resetEstat();
 
-    // Cargar noves preguntes del servidor
     fetch('api/getPreguntes.php')
         .then(res => res.json())
         .then(data => {
@@ -411,20 +334,20 @@ function EsborrarPartida() {
 
 // Marca la resposta seleccionada
 function marcarResposta(numPregunta, numResposta) {
-    // Quitar selecció previa
+    // Treure selecció prèvia
     document.querySelectorAll(`[id^="${numPregunta}_"]`).forEach(btn => btn.classList.remove("seleccionada"));
 
-    // Afegir selecció
+    // Afegir selecció nova
     const btnSel = document.getElementById(`${numPregunta}_${numResposta}`);
     if (btnSel) btnSel.classList.add("seleccionada");
 
     // Guardar resposta seleccionada
     estatDeLaPartida.respostesUsuari[numPregunta] = numResposta;
 
-    // Actualitzar contador
+    // Actualitzar comptador
     estatDeLaPartida.contadorPreguntes = estatDeLaPartida.respostesUsuari.filter(r => r !== undefined).length;
 
-    // Si ha respost totes, activar botó enviar
+    // Mostrar botó enviar si totes respostes estan fetes
     if (estatDeLaPartida.contadorPreguntes === estatDeLaPartida.preguntes.length) {
         const btnEnviar = document.getElementById("btnEnviar");
         if (btnEnviar) btnEnviar.style.display = "block";
@@ -435,33 +358,42 @@ function marcarResposta(numPregunta, numResposta) {
 
 // Actualitza marcador i guarda en localStorage
 function actualitzarMarcador() {
-    document.getElementById("marcador").innerHTML = renderMarcador();
+    const marcador = document.getElementById("marcador");
+    marcador.innerHTML = renderMarcador();
 
-    // Marcar visualment respostes ja seleccionades
+    // Actualitzar color de la barra segons el temps restant
+    const tempsBar = marcador.querySelector(".progress-bar.temps");
+    if (estatDeLaPartida.tempsRestant <= 10) {
+        tempsBar.classList.add("critical");
+        tempsBar.classList.remove("low");
+    } else if (estatDeLaPartida.tempsRestant <= 20) {
+        tempsBar.classList.add("low");
+        tempsBar.classList.remove("critical");
+    } else {
+        tempsBar.classList.remove("low", "critical");
+    }
+
+    // Marcar respostes seleccionades
     estatDeLaPartida.respostesUsuari.forEach((r, i) => {
         if (r !== undefined) document.getElementById(`${i}_${r}`).classList.add("seleccionada");
     });
 
-    // Reasignar evento borrar
     document.getElementById("btnBorrar").addEventListener("click", EsborrarPartida);
 
-    // Guardar estat en localStorage
+    // Guardar estat actual en localStorage
     localStorage.setItem(`partida_${nomUsuari}`, JSON.stringify(estatDeLaPartida));
 }
 
-// Timer
+
+// Temporitzador amb actualització de barra
 function timer() {
-    // Si ja hi ha un timer, el netegem
     if (idTimer) clearInterval(idTimer);
 
-    // Iniciem nou timer
     idTimer = setInterval(() => {
-        // Si queda temps, decrementem i actualitzem marcador
         if (estatDeLaPartida.tempsRestant > 0) {
             estatDeLaPartida.tempsRestant--;
             actualitzarMarcador();
         } else {
-            // Si s'acaba el temps, aturem timer i enviem estat
             clearInterval(idTimer);
             console.log("Temps acabat!");
             enviarEstat(true);
@@ -469,33 +401,26 @@ function timer() {
     }, 1000);
 }
 
-// Envía estat al servidor
+// Envia estat al servidor
 function enviarEstat(manual = false) {
-    // Enviem dades al servidor
     fetch("api/recollida.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            // Dades a enviar
             contadorPreguntes: estatDeLaPartida.contadorPreguntes,
             respostesUsuari: estatDeLaPartida.respostesUsuari
         })
     })
-        // Resposta del servidor
         .then(res => res.text())
         .then(data => {
             console.log("Respostes enviades:", data);
 
-            // Si s'ha enviat manualment, desactivar botó i mostrar missatge
             if (manual) {
                 const btnEnviar = document.getElementById("btnEnviar");
-                // Desactivar botó enviar
                 if (btnEnviar) btnEnviar.style.display = "none";
 
-                // Mostrar missatge enviat
                 const questionari = document.getElementById("questionari");
 
-                // Evitar duplicats
                 if (questionari && !document.querySelector(".leyenda-enviades")) {
                     questionari.insertAdjacentHTML("beforeend", `<p class='leyenda-enviades'>Respostes enviades!</p>`);
                 }

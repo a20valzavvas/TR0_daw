@@ -1,4 +1,4 @@
-/* ===== Estilos generales ===== */
+/* ===== Estils generals ===== */
 * {
   margin: 0;
   padding: 0;
@@ -16,7 +16,7 @@ body {
   color: #5c4b51;
 }
 
-/* ===== Contenedor principal ===== */
+/* ===== Contenidor principal ===== */
 #app {
   background: #fffafc;
   padding: 40px 30px;
@@ -49,7 +49,7 @@ p {
   color: #7d6f74;
 }
 
-/* ===== Botones ===== */
+/* ===== Botons ===== */
 button {
   border: none;
   padding: 12px 22px;
@@ -103,32 +103,32 @@ button:disabled:hover {
 }
 
 button.seleccionada {
-    border: 2px solid #de3486;
+  border: 2px solid #de3486;
 }
 
-/* ===== Preguntas ===== */
+/* ===== Preguntes ===== */
 #questionari {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
 
 .pregunta {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-}
- 
-.pregunta img {
-    margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-/* 👉 2 columnas fijas simétricas */
+.pregunta img {
+  margin: 10px 0;
+}
+
+/* 2 columnes fixes simètriques */
 .pregunta-buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* dos columnas iguales */
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
   width: 100%;
   max-width: 500px;
@@ -136,31 +136,252 @@ button.seleccionada {
 
 .pregunta-buttons button {
   width: 100%;
-  margin: 0; /* usamos el gap del grid */
+  margin: 0;
   text-align: center;
   padding: 12px;
 }
 
-/* ===== Marcador ===== */
+/* ===== Marcador flotant adaptatiu ===== */
 #marcador {
-  margin-top: 25px;
-  background: #f8f4ff;
-  padding: 15px;
-  border-radius: 16px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 260px;
+  background: rgba(255, 250, 252, 0.9);
+  backdrop-filter: blur(6px);
+  border: 2px solid #f3e6ff;
+  border-radius: 20px;
+  padding: 18px 20px;
   font-size: 0.95em;
-  text-align: left;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: all 0.3s ease;
 }
 
-/* ===== Animaciones suaves ===== */
+#marcador h3 {
+  font-size: 1.1em;
+  color: #6d5e73;
+  margin-bottom: 8px;
+}
+
+/* Texts del marcador */
+#marcador p {
+  color: #6f6570;
+  line-height: 1.5em;
+  margin-bottom: 6px;
+}
+
+/* Botó "Borrar Partida" */
+#marcador .btn-borrar {
+  background: #ffe0e0;
+  color: #8b1d1d;
+  margin-top: 8px;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 0.85em;
+  display: inline-block;
+  width: auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+#marcador .btn-borrar:hover {
+  background: #ffcccc;
+  transform: none;
+  box-shadow: 0 3px 6px rgba(139, 29, 29, 0.15);
+}
+
+/* ===== Bullets de preguntes ===== */
+.bullets-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 5px;
+}
+
+.bullet {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #d1c4e9;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.bullet.resposta {
+  background-color: #cdb4ff;
+  border-color: #b388eb;
+}
+
+.bullet.resposta:nth-child(odd) {
+  background-color: #ffc8dd;
+  border-color: #ffafcc;
+}
+
+/* ===== Barra de progrés (temps) ===== */
+.progress-container {
+  width: 100%;
+  height: 14px;
+  background-color: #f0e6f8;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 8px 0;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar.temps {
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #b8f5c1, #a3d8ff);
+  transition: width 0.4s ease;
+}
+
+/* Canvi de color segons el temps restant */
+.progress-bar.temps.low {
+  background: linear-gradient(90deg, #ffd6a3, #ffc3c3);
+}
+
+.progress-bar.temps.critical {
+  background: linear-gradient(90deg, #ff9a9a, #ff5959);
+}
+
+.temps-text {
+  font-size: 0.85em;
+  color: #6d5e73;
+  margin-bottom: 6px;
+}
+
+/* ===== Versió mòbil ===== */
+@media (max-width: 768px) {
+  #marcador {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    border-radius: 0 0 18px 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 10px 14px;
+  }
+
+  #marcador h3 {
+    display: none; /* ocultem el títol per guanyar espai */
+  }
+
+  .bullets-container {
+    gap: 4px;
+  }
+
+  #marcador .btn-borrar {
+    padding: 6px 12px;
+    font-size: 0.8em;
+  }
+}
+
+/* ===== Panell d'administració ===== */
+.admin-header {
+  position: sticky;
+  top: 0;
+  background: #fffafc;
+  padding: 10px 15px;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-header h1 {
+  font-size: 1.6em;
+  color: #4b3f45;
+  margin: 0;
+}
+
+/* Botons admin */
+.admin.add {
+  background: #c9f5ff;
+  color: #174852;
+}
+.admin.add:hover { background: #b3ecfa; }
+
+.admin.back {
+  background: #ffe4f1;
+  color: #73324b;
+}
+.admin.back:hover { background: #ffd2e8; }
+
+/* Preguntes admin */
+.preguntaItem {
+  background: #fff;
+  border: 2px solid #f3e8f7;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 15px;
+  text-align: left;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.preguntaItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.preguntaItem img {
+  border-radius: 12px;
+  margin: 10px 0;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+}
+
+/* Botons editar / eliminar */
+.editarBtn, .eliminarBtn {
+  padding: 10px 18px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9em;
+  margin: 5px 5px 0 0;
+  transition: all 0.25s ease;
+}
+
+.editarBtn {
+  background-color: #cce5ff;
+  color: #214e7c;
+}
+.editarBtn:hover {
+  background-color: #b3d8ff;
+  box-shadow: 0 2px 6px rgba(33, 78, 124, 0.25);
+}
+
+.eliminarBtn {
+  background-color: #ffd6d6;
+  color: #8b1d1d;
+}
+.eliminarBtn:hover {
+  background-color: #ffbdbd;
+  box-shadow: 0 2px 6px rgba(139, 29, 29, 0.25);
+}
+
+/* ===== Animacions suaus ===== */
 @keyframes fadeIn {
   from {opacity: 0; transform: translateY(10px);}
   to {opacity: 1; transform: translateY(0);}
 }
 
 .leyenda-enviades {
-    color: #28a745;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 20px;
-    font-size: 18px;
+  color: #28a745;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 18px;
 }
