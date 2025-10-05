@@ -102,6 +102,14 @@ button:disabled:hover {
   box-shadow: none !important;
 }
 
+
+button.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 button.seleccionada {
   border: 2px solid #de3486;
 }

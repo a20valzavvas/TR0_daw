@@ -153,6 +153,18 @@ function renderResultatsFinals() {
     document.getElementById("btnTornar").addEventListener("click", renderInici);
 }
 
+// Desactiva tots els botons de resposta quan s'acaba el temps
+function bloquejarRespostes() {
+    const botons = document.querySelectorAll(".pregunta-buttons button");
+    botons.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add("disabled");
+        btn.style.cursor = "not-allowed";
+        btn.style.opacity = "0.6";
+    });
+}
+
+
 
 /*====================
    FUNCIONS ADMIN
@@ -578,7 +590,7 @@ function mostrarPuntuacioFinal() {
                         ${detallsHTML}
                     </div>
                     <div style="margin-top:25px;">
-                        <button id="btnReiniciar" class="btn-primary">Tornar a intentar</button>
+                        <button id="btnReiniciar" class="btn-primary">Torna-ho a intentar</button>
                         <button id="btnSortir" class="btn-borrar">Sortir</button>
                     </div>
                 </div>
@@ -608,6 +620,7 @@ function timer() {
         } else {
             clearInterval(idTimer);
             console.log("Temps acabat!");
+            bloquejarRespostes();
             enviarEstat(true);
         }
     }, 1000);
@@ -630,6 +643,8 @@ function enviarEstat(manual = false) {
             if (manual) {
                 const btnEnviar = document.getElementById("btnEnviar");
                 if (btnEnviar) btnEnviar.style.display = "none";
+
+                bloquejarRespostes();
 
                 const questionari = document.getElementById("questionari");
 
